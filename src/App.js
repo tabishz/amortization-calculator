@@ -13,20 +13,27 @@ class App extends Component {
     };
   }
 
-  updateValue = (e) => {
+  updateValue = async (e) => {
     console.log(`Setting ${e.target.id} = ${e.target.value}`);
-    this.setState({[e.target.id]: e.target.value});
+    await this.setState({[e.target.id]: e.target.value});
     if (this.state.loanAmount && this.state.interest && this.state.frequency && this.state.years) {
       console.log('calculating...');
-      this.setState({frequency: parseInt(this.state.frequency)});
-      const effectiveInterest = this.state.interest / this.state.frequency;
-      const totalNumOfPayments = this.state.frequency * this.state.years;
-      const paymentAmount = this.state.loanAmount * ((effectiveInterest *
+      const frequency = parseInt(this.state.frequency);
+      const years = parseInt(this.state.years);
+      const interest = parseInt(this.state.interest);
+      const loanAmount = parseInt(this.state.loanAmount);
+      const effectiveInterest = (interest/100) / frequency;
+      const totalNumOfPayments = frequency * years;
+      console.log(`Total number of Payments: ${totalNumOfPayments}`);
+      const paymentAmount = loanAmount * ((effectiveInterest *
           (1+effectiveInterest)^totalNumOfPayments) /
           (((1+effectiveInterest)^totalNumOfPayments) - 1));
-      this.setState({totalNumOfPayments: totalNumOfPayments,
-          payment: paymentAmount, effectiveInterest: effectiveInterest,
+      await this.setState({
+        totalNumOfPayments: totalNumOfPayments,
+        payment: paymentAmount,
+        effectiveInterest: effectiveInterest,
       });
+      this.forceUpdate();
     }
     return;
   };
@@ -53,7 +60,7 @@ class App extends Component {
   renderRows() {
     if (!this.state.payment) return;
     const rows= [];
-    let remainingPrincipal = this.state.loanAmount;
+    let remainingPrincipal = parseFloat(this.state.loanAmount);
     let principalAmount = 0;
 
     for (let i=1; i<=this.state.totalNumOfPayments; i++) {
@@ -117,13 +124,14 @@ class App extends Component {
 class ItemRow extends Component {
   render() {
     const item = this.props;
+    const pn = item.paymentNumber.toString();
     return(
-      <tr key={'row'+ item.paymentNumber}>
-        <td key={'p' + item.paymentNumber}>{item.paymentNumber}</td>
-        <td key={'pay' + item.paymentNumber}>{item.payment}</td>
-        <td key={'prin' + item.paymentNumber}>{item.principalAmount}</td>
-        <td key={'intre' + item.paymentNumber}>{item.interestAmount}</td>
-        <td key={'rem' + item.paymentNumber}>{item.remainingPrincipal}</td>
+      <tr key={'row'+ pn}>
+        <td key={'p' + pn}>{item.paymentNumber}</td>
+        <td key={'pay' + pn}>{item.payment}</td>
+        <td key={'prin' + pn}>{item.principalAmount}</td>
+        <td key={'intre' + pn}>{item.interestAmount}</td>
+        <td key={'rem' + pn}>{item.remainingPrincipal}</td>
       </tr>
     );
   }
