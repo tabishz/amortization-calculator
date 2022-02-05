@@ -6,7 +6,7 @@ class App extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      loanAmount: 0,
+      loanAmount: 100000,
       interest: 3.7,
       frequency: 12,
       years: 1,
@@ -36,7 +36,7 @@ class App extends Component {
 
   amortizationTable() {
     return(
-      <table id="amortizationSchedule" width="95%">
+      <table id="amortizationSchedule" width="95%" align="center">
         <thead>
           <tr>
             <th>Payment Number</th>
@@ -73,6 +73,7 @@ class App extends Component {
           remainingPrincipal={remainingPrincipal}
         />
       );
+      if (remainingPrincipal <= principalAmount) break;
     }
     return(rows);
   }
@@ -82,10 +83,13 @@ class App extends Component {
     return (
       <div className="App">
         <label>Loan Amount: </label>
-        <input type="number" id="loanAmount" onChange={this.updateValue}></input>
+        <input type="number" id="loanAmount" placeholder="100000" onChange={this.updateValue}></input>
         <br />
         <label>Interest Rate: </label>
-        <input type="number" id="interest" placeholder="3%" onChange={this.updateValue}></input>
+        <input type="number" id="interest" placeholder="3.7%" onChange={this.updateValue}></input>
+        <br />
+        <label>Payment Amount: </label>
+        <input type="number" id="payment" onChange={this.updateValue}></input>
         <br />
         <label>Payment Frequency: </label>
         <select id="frequency" onChange={this.updateValue}>
@@ -104,6 +108,7 @@ class App extends Component {
           <option value="25">25 Years</option>
           <option value="30">30 Years</option>
         </select>
+        <button onClick={this.updateValue}>Calculate!</button>
         <p>
           Loan Value: {numForm.format(this.state.loanAmount)}<br />
           Interest Rate: {this.state.interest}%<br />
