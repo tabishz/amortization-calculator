@@ -94,13 +94,13 @@ class App extends Component {
     return (
       <div className="App">
         <label>Loan Amount: </label>
-        <input type="number" id="loanAmount" placeholder="100000" onChange={this.updateValue}></input>
+        <input type="number" id="loanAmount" placeholder={numForm.format(this.state.loanAmount)} onChange={this.updateValue}></input>
         <br />
         <label>Interest Rate: </label>
         <input type="number" id="interest" placeholder="3.7%" onChange={this.updateValue}></input>
         <br />
         <label>Payment Amount: </label>
-        <input type="number" id="alternatePayment" onChange={this.updateValue}></input>
+        <input type="number" id="alternatePayment" placeholder={numForm.format(this.state.payment)} onChange={this.updateValue}></input>
         <br />
         <label>Payment Frequency: </label>
         <select id="frequency" onChange={this.updateValue}>
