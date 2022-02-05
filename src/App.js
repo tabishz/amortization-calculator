@@ -29,8 +29,9 @@ class App extends Component {
       const loanAmount = parseFloat(this.state.loanAmount);
       const effInt = (interest/100) / frequency;
       const totalNumOfPayments = frequency * years;
-      const paymentAmount = loanAmount * ((effInt * Math.pow(1+effInt,totalNumOfPayments)/
+      let paymentAmount = loanAmount * ((effInt * Math.pow(1+effInt,totalNumOfPayments)/
           (Math.pow(1+effInt,totalNumOfPayments) - 1)));
+      if (this.state.alternatePayment) paymentAmount = this.state.alternatePayment;
       const rows= [];
       let remainingPrincipal = loanAmount;
       let principalAmount = 0;
@@ -97,7 +98,7 @@ class App extends Component {
         <input type="number" id="interest" placeholder="3.7%" onChange={this.updateValue}></input>
         <br />
         <label>Payment Amount: </label>
-        <input type="number" id="payment" onChange={this.updateValue}></input>
+        <input type="number" id="alternatePayment" onChange={this.updateValue}></input>
         <br />
         <label>Payment Frequency: </label>
         <select id="frequency" onChange={this.updateValue}>
@@ -116,7 +117,8 @@ class App extends Component {
           <option value="25">25 Years</option>
           <option value="30">30 Years</option>
         </select>
-        <button onClick={this.updateValue}>Calculate!</button>
+        <br />
+        <button onClick={this.doCalc}>Calculate!</button>
         <p>
           Loan Value: {numForm.format(this.state.loanAmount)}<br />
           Interest Rate: {this.state.interest}%<br />
