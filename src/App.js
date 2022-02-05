@@ -36,12 +36,14 @@ class App extends Component {
       let remainingPrincipal = loanAmount;
       let principalAmount = 0;
       let totalInterestPaid = 0;
+      let actualNumOfPayments = 0;
   
       for (let i=1; i<=totalNumOfPayments; i++) {
         remainingPrincipal = remainingPrincipal - principalAmount;
         const interestAmount = effInt * remainingPrincipal;
         principalAmount = paymentAmount - interestAmount;
         totalInterestPaid = totalInterestPaid + interestAmount;
+        actualNumOfPayments++;
         rows.push(
           <ItemRow
             key={'r'+i}
@@ -55,7 +57,7 @@ class App extends Component {
         if (remainingPrincipal <= principalAmount) break;
       }
       await this.setState({
-        totalNumOfPayments: totalNumOfPayments,
+        totalNumOfPayments: actualNumOfPayments,
         payment: paymentAmount,
         effInt: effInt,
         rows: rows,
