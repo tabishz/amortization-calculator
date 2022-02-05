@@ -16,6 +16,11 @@ class App extends Component {
   updateValue = async (e) => {
     // console.log(`Setting ${e.target.id} = ${e.target.value}`);
     await this.setState({[e.target.id]: e.target.value});
+    await this.doCalc();
+    return;
+  };
+
+  doCalc = async() => {
     if (this.state.loanAmount && this.state.interest && this.state.frequency && this.state.years) {
       const frequency = parseInt(this.state.frequency);
       const years = parseInt(this.state.years);
@@ -31,7 +36,6 @@ class App extends Component {
         effInt: effInt,
       });
     }
-    return;
   };
 
   amortizationTable() {
@@ -77,6 +81,10 @@ class App extends Component {
     }
     return(rows);
   }
+
+  componentDidMount() {
+    this.doCalc();
+  };
 
   render() {
     const numForm = new Intl.NumberFormat('en-CA', {style: 'currency', currency: 'CAD'});
