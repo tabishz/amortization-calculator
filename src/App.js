@@ -10,6 +10,7 @@ class App extends Component {
       interest: 3.7,
       frequency: 12,
       years: 1,
+      totalInterestPaid: 0,
     };
   }
 
@@ -30,10 +31,34 @@ class App extends Component {
       const totalNumOfPayments = frequency * years;
       const paymentAmount = loanAmount * ((effInt * Math.pow(1+effInt,totalNumOfPayments)/
           (Math.pow(1+effInt,totalNumOfPayments) - 1)));
+      const rows= [];
+      let remainingPrincipal = loanAmount;
+      let principalAmount = 0;
+      let totalInterestPaid = 0;
+  
+      for (let i=1; i<=totalNumOfPayments; i++) {
+        remainingPrincipal = remainingPrincipal - principalAmount;
+        const interestAmount = effInt * remainingPrincipal;
+        principalAmount = paymentAmount - interestAmount;
+        totalInterestPaid = totalInterestPaid + interestAmount;
+        rows.push(
+          <ItemRow
+            key={'r'+i}
+            paymentNumber={i}
+            payment={paymentAmount} 
+            principalAmount={principalAmount}
+            interestAmount={interestAmount}
+            remainingPrincipal={remainingPrincipal}
+          />
+        );
+        if (remainingPrincipal <= principalAmount) break;
+      }
       await this.setState({
         totalNumOfPayments: totalNumOfPayments,
         payment: paymentAmount,
         effInt: effInt,
+        rows: rows,
+        totalInterestPaid: totalInterestPaid,
       });
     }
   };
@@ -51,36 +76,11 @@ class App extends Component {
           </tr>
         </thead>
         <tbody>
-          {this.renderRows()}
+          {this.state.rows}
         </tbody>
       </table>
     );
   };
-
-  renderRows() {
-    if (!this.state.payment) return;
-    const rows= [];
-    let remainingPrincipal = parseFloat(this.state.loanAmount);
-    let principalAmount = 0;
-
-    for (let i=1; i<=this.state.totalNumOfPayments; i++) {
-      remainingPrincipal = remainingPrincipal - principalAmount;
-      const interestAmount = this.state.effInt * remainingPrincipal;
-      principalAmount = this.state.payment - interestAmount;
-      rows.push(
-        <ItemRow
-          key={'r'+i}
-          paymentNumber={i}
-          payment={this.state.payment} 
-          principalAmount={principalAmount}
-          interestAmount={interestAmount}
-          remainingPrincipal={remainingPrincipal}
-        />
-      );
-      if (remainingPrincipal <= principalAmount) break;
-    }
-    return(rows);
-  }
 
   componentDidMount() {
     this.doCalc();
@@ -124,6 +124,7 @@ class App extends Component {
           Amortization Period: {this.state.years}<br />
           Periodic Payment Amount: {numForm.format(this.state.payment)}<br />
           Total Number of Payments: {this.state.totalNumOfPayments}<br />
+          Total Interest Paid: {numForm.format(this.state.totalInterestPaid)}<br />
         </p>
         <div>
           {this.amortizationTable()}
