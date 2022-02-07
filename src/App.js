@@ -68,14 +68,14 @@ class App extends Component {
 
   amortizationTable() {
     return(
-      <table id="amortizationSchedule" width="95%" align="center">
+      <table className="amortization" id="amortizationSchedule" width="95%" align="center">
         <thead>
           <tr>
-            <th>Payment Number</th>
-            <th>Payment Amount</th>
-            <th>Principal Amount</th>
-            <th>Interest Amount</th>
-            <th>Remaining Principal</th>
+            <th className="amortization">Payment Number</th>
+            <th className="amortization">Payment Amount</th>
+            <th className="amortization">Principal Amount</th>
+            <th className="amortization">Interest Amount</th>
+            <th className="amortization">Remaining Principal</th>
           </tr>
         </thead>
         <tbody>
@@ -121,15 +121,38 @@ class App extends Component {
         </select>
         <br />
         <button onClick={this.doCalc}>Calculate!</button>
-        <p>
-          Loan Value: {numForm.format(this.state.loanAmount)}<br />
-          Interest Rate: {this.state.interest}%<br />
-          Payment Per Year: {this.state.frequency}<br />
-          Amortization Period: {this.state.years}<br />
-          Periodic Payment Amount: {numForm.format(this.state.payment)}<br />
-          Total Number of Payments: {this.state.totalNumOfPayments}<br />
-          Total Interest Paid: {numForm.format(this.state.totalInterestPaid)}<br />
-        </p>
+        <table className="info" align="center">
+          <tbody>
+          <tr>
+            <td className="titles">Loan Value:</td>
+            <td>{numForm.format(this.state.loanAmount)}</td>
+          </tr>
+          <tr>
+            <td className="titles">Interest Rate:</td>
+            <td>{this.state.interest}%</td>
+          </tr>
+          <tr>
+            <td className="titles">Payment Per Year:</td>
+            <td>{this.state.frequency} payments / year</td>
+          </tr>
+          <tr>
+            <td className="titles">Amortization Period:</td>
+            <td>{this.state.years} {this.state.years>1 ? 'years' : 'year'}</td>
+          </tr>
+          <tr>
+            <td className="titles">Periodic Payment Amount:</td>
+            <td>{numForm.format(this.state.payment)}</td>
+          </tr>
+          <tr>
+            <td className="titles">Total Number of Payments:</td>
+            <td>{this.state.totalNumOfPayments}</td>
+          </tr>
+          <tr>
+            <td className="titles">Total Interest Paid:</td>
+            <td>{numForm.format(this.state.totalInterestPaid)}</td>
+          </tr>
+          </tbody>
+        </table>
         <div>
           {this.amortizationTable()}
         </div>
@@ -143,9 +166,9 @@ class ItemRow extends Component {
     const item = this.props;
     const numForm = new Intl.NumberFormat('en-CA', {style: 'currency', currency: 'CAD'});
     return(
-      <tr>
+      <tr className="amortization">
         <td>{item.paymentNumber}</td>
-        <td>{numForm.format(item.payment)}</td>
+        <td className="payment">{numForm.format(item.payment)}<img className="lumpsum" alt="add lump sum payment" src="plus.svg" height="20px" /></td>
         <td>{numForm.format(item.principalAmount)}</td>
         <td>{numForm.format(item.interestAmount)}</td>
         <td>{numForm.format(item.remainingPrincipal)}</td>
