@@ -1,9 +1,10 @@
-import './App.css';
-import React, {Component} from 'react';
+import { setSelectionRange } from "@testing-library/user-event/dist/utils";
+import "./App.css";
+import React, { Component } from "react";
 // import ReactDOM from 'react-dom';
 
 class App extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       loanAmount: 100000,
@@ -16,29 +17,56 @@ class App extends Component {
 
   updateValue = async (e) => {
     // console.log(`Setting ${e.target.id} = ${e.target.value}`);
-    await this.setState({[e.target.id]: e.target.value});
+    await this.setState({ [e.target.id]: e.target.value });
     await this.doCalc();
     return;
   };
 
-  doCalc = async() => {
-    if (this.state.loanAmount && this.state.interest && this.state.frequency && this.state.years) {
+  reset = async () => {
+    await this.setState({
+      loanAmount: 100000,
+      interest: 3.7,
+      frequency: 12,
+      years: 1,
+      totalInterestPaid: 0,
+      paymentAmount: 8501.29,
+      alternatePayment: null,
+    });
+    const altPayment = document.getElementById('alternatePayment');
+    altPayment.value = '';
+    await this.doCalc();
+    return;
+  };
+
+  doCalc = async () => {
+    if (
+      this.state.loanAmount &&
+      this.state.interest &&
+      this.state.frequency &&
+      this.state.years
+    ) {
       const frequency = parseInt(this.state.frequency);
       const years = parseInt(this.state.years);
       const interest = parseFloat(this.state.interest);
       const loanAmount = parseFloat(this.state.loanAmount);
-      const effInt = (interest/100) / frequency;
+      const effInt = interest / 100 / frequency;
       const totalNumOfPayments = frequency * years;
-      let paymentAmount = loanAmount * ((effInt * Math.pow(1+effInt,totalNumOfPayments)/
-          (Math.pow(1+effInt,totalNumOfPayments) - 1)));
-      if (this.state.alternatePayment) paymentAmount = this.state.alternatePayment;
-      const rows= [];
+      const altPayment = document.getElementById('alternatePayment').value;
+      if (altPayment) await this.setState({alternatePayment: altPayment});
+      let paymentAmount =
+        loanAmount *
+        ((effInt * Math.pow(1 + effInt, totalNumOfPayments)) /
+          (Math.pow(1 + effInt, totalNumOfPayments) - 1));
+      if (this.state.alternatePayment) {
+        paymentAmount = this.state.alternatePayment;
+      }
+      const rows = [];
       let remainingPrincipal = loanAmount;
       let principalAmount = 0;
       let totalInterestPaid = 0;
       let actualNumOfPayments = 0;
-  
-      for (let i=1; i<=totalNumOfPayments; i++) {
+
+      for (let i = 1; i <= totalNumOfPayments; i++) {
         remainingPrincipal = remainingPrincipal - principalAmount;
         const interestAmount = effInt * remainingPrincipal;
         principalAmount = paymentAmount - interestAmount;
@@ -46,15 +74,18 @@ class App extends Component {
         actualNumOfPayments++;
         rows.push(
           <ItemRow
-            key={'r'+i}
+            key={"r" + i}
             paymentNumber={i}
-            payment={paymentAmount} 
+            payment={paymentAmount}
             principalAmount={principalAmount}
             interestAmount={interestAmount}
             remainingPrincipal={remainingPrincipal}
           />
         );
         if (remainingPrincipal <= principalAmount) break;
+      }
+      if (actualNumOfPayments < totalNumOfPayments) {
+        this.setState({ years: actualNumOfPayments / frequency });
       }
       await this.setState({
         totalNumOfPayments: actualNumOfPayments,
@@ -67,8 +98,13 @@ class App extends Component {
   };
 
   amortizationTable() {
-    return(
-      <table className="amortization" id="amortizationSchedule" width="95%" align="center">
+    return (
+      <table
+        className="amortization"
+        id="amortizationSchedule"
+        width="95%"
+        align="center"
+      >
         <thead>
           <tr>
             <th className="amortization">Payment Number</th>
@@ -78,97 +114,146 @@ class App extends Component {
             <th className="amortization">Remaining Principal</th>
           </tr>
         </thead>
-        <tbody>
-          {this.state.rows}
-        </tbody>
+        <tbody>{this.state.rows}</tbody>
       </table>
     );
-  };
+  }
 
   componentDidMount() {
     this.doCalc();
-  };
+  }
 
   render() {
-    const numForm = new Intl.NumberFormat('en-CA', {style: 'currency', currency: 'CAD'});
+    const numForm = new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency: "CAD",
+    });
+    const yearsFormat = new Intl.NumberFormat("en-CA", {
+      maximumSignificantDigits: 2,
+    });
     return (
       <div className="App">
-        <label>Loan Amount: </label>
-        <input type="number" id="loanAmount" placeholder={numForm.format(this.state.loanAmount)} onChange={this.updateValue}></input>
+        <label>Loan Amount:
+        <input
+          type="number"
+          id="loanAmount"
+          step="1000"
+          placeholder={numForm.format(this.state.loanAmount)}
+          value={this.state.loanAmount}
+          onChange={this.updateValue}
+        ></input>
+        </label>
         <br />
-        <label>Interest Rate: </label>
-        <input type="number" id="interest" placeholder="3.7%" onChange={this.updateValue}></input>
+        <label>Interest Rate:
+        <input
+          type="number"
+          id="interest"
+          placeholder="3.7%"
+          step="0.1"
+          value={this.state.interest}
+          onChange={this.updateValue}
+        ></input>
+        </label>
         <br />
-        <label>Payment Amount: </label>
-        <input type="number" id="alternatePayment" placeholder={numForm.format(this.state.payment)} onChange={this.updateValue}></input>
+        <label>Payment Amount:
+        <input
+          type="number"
+          id="alternatePayment"
+          value={this.state.alternatePayment}
+          step="1"
+          placeholder={numForm.format(this.state.payment)}
+        ></input>
+        </label>
         <br />
-        <label>Payment Frequency: </label>
-        <select id="frequency" onChange={this.updateValue}>
+        <label>Payment Frequency:
+        <select
+          id="frequency"
+          value={this.state.frequency}
+          onChange={this.updateValue}
+        >
           <option value="12">Monthly</option>
           <option value="26">Bi-Weekly</option>
-          <option value="52">Weekly</option>          
+          <option value="52">Weekly</option>
         </select>
+        </label>
         <br />
-        <label>Amortization Years: </label>
-        <select id="years" onChange={this.updateValue}>
+        <label>Amortization Years:
+        <select id="years" value={this.state.years} onChange={this.updateValue}>
           <option value="1">1 Year</option>
           <option value="5">5 Years</option>
+          <option value="6">6 Years</option>
+          <option value="7">7 Years</option>
+          <option value="8">8 Years</option>
           <option value="10">10 Years</option>
           <option value="15">15 Years</option>
           <option value="20">20 Years</option>
           <option value="25">25 Years</option>
           <option value="30">30 Years</option>
         </select>
+        </label>
         <br />
-        <button onClick={this.doCalc}>Calculate!</button>
+        <button onClick={this.doCalc}>Calculate</button>
+        <button onClick={this.reset}>Reset</button>
         <table className="info" align="center">
           <tbody>
-          <tr>
-            <td className="titles">Loan Value:</td>
-            <td>{numForm.format(this.state.loanAmount)}</td>
-          </tr>
-          <tr>
-            <td className="titles">Interest Rate:</td>
-            <td>{this.state.interest}%</td>
-          </tr>
-          <tr>
-            <td className="titles">Payment Per Year:</td>
-            <td>{this.state.frequency} payments / year</td>
-          </tr>
-          <tr>
-            <td className="titles">Amortization Period:</td>
-            <td>{this.state.years} {this.state.years>1 ? 'years' : 'year'}</td>
-          </tr>
-          <tr>
-            <td className="titles">Periodic Payment Amount:</td>
-            <td>{numForm.format(this.state.payment)}</td>
-          </tr>
-          <tr>
-            <td className="titles">Total Number of Payments:</td>
-            <td>{this.state.totalNumOfPayments}</td>
-          </tr>
-          <tr>
-            <td className="titles">Total Interest Paid:</td>
-            <td>{numForm.format(this.state.totalInterestPaid)}</td>
-          </tr>
+            <tr>
+              <td className="titles">Loan Value:</td>
+              <td>{numForm.format(this.state.loanAmount)}</td>
+            </tr>
+            <tr>
+              <td className="titles">Interest Rate:</td>
+              <td>{this.state.interest}%</td>
+            </tr>
+            <tr>
+              <td className="titles">Payment Per Year:</td>
+              <td>{this.state.frequency} payments / year</td>
+            </tr>
+            <tr>
+              <td className="titles">Amortization Period:</td>
+              <td>
+                {yearsFormat.format(this.state.years)}{" "}
+                {this.state.years > 1 ? "years" : "year"}
+              </td>
+            </tr>
+            <tr>
+              <td className="titles">Periodic Payment Amount:</td>
+              <td>{numForm.format(this.state.payment)}</td>
+            </tr>
+            <tr>
+              <td className="titles">Total Number of Payments:</td>
+              <td>{this.state.totalNumOfPayments}</td>
+            </tr>
+            <tr>
+              <td className="titles">Total Interest Paid:</td>
+              <td>{numForm.format(this.state.totalInterestPaid)}</td>
+            </tr>
           </tbody>
         </table>
-        <div>
-          {this.amortizationTable()}
-        </div>
+        <div>{this.amortizationTable()}</div>
       </div>
     );
   }
-};
+}
 
 class ItemRow extends Component {
   render() {
     const item = this.props;
-    const numForm = new Intl.NumberFormat('en-CA', {style: 'currency', currency: 'CAD'});
-    return(
+    const numForm = new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency: "CAD",
+    });
+    return (
       <tr className="amortization">
         <td>{item.paymentNumber}</td>
-        <td className="payment">{numForm.format(item.payment)}<img className="lumpsum" alt="add lump sum payment" src="plus.svg" height="20px" /></td>
+        <td className="payment">
+          {numForm.format(item.payment)}
+          <img
+            className="lumpsum"
+            alt="add lump sum payment"
+            src="plus.svg"
+            height="20px"
+          />
+        </td>
         <td>{numForm.format(item.principalAmount)}</td>
         <td>{numForm.format(item.interestAmount)}</td>
         <td>{numForm.format(item.remainingPrincipal)}</td>
