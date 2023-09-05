@@ -34,6 +34,12 @@ table.info {
   text-align: left;
 }
 
+button {
+  border-radius: 1em;
+  height: 2.5em;
+  font-size: 1em;
+}
+
 td.titles { font-weight: bold;}
 
 img.lumpsum { vertical-align: middle; display: none; }
