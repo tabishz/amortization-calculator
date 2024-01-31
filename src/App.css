@@ -58,3 +58,12 @@ td.payment:hover img.lumpsum { display: inline-block;}
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 600px) {
+  label.valuesBlock {
+    width: 100%;
+  }
+  table.info {
+    width: 100%;
+  }
+}
