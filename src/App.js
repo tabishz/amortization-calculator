@@ -65,12 +65,14 @@ class App extends Component {
       let principalAmount = 0;
       let totalInterestPaid = 0;
       let actualNumOfPayments = 0;
+      let cumulativeInterest = 0;
 
       for (let i = 1; i <= totalNumOfPayments; i++) {
         remainingPrincipal = remainingPrincipal - principalAmount;
         const interestAmount = effInt * remainingPrincipal;
         principalAmount = paymentAmount - interestAmount;
         totalInterestPaid = totalInterestPaid + interestAmount;
+        cumulativeInterest = cumulativeInterest + interestAmount;
         actualNumOfPayments++;
         rows.push(
           <ItemRow
@@ -79,6 +81,7 @@ class App extends Component {
             payment={paymentAmount}
             principalAmount={principalAmount}
             interestAmount={interestAmount}
+            cumulativeInterest={cumulativeInterest}
             remainingPrincipal={remainingPrincipal}
           />
         );
@@ -111,6 +114,7 @@ class App extends Component {
             <th className="amortization">Payment Amount</th>
             <th className="amortization">Principal Amount</th>
             <th className="amortization">Interest Amount</th>
+            <th className="amortization">Cumulative Interest</th>
             <th className="amortization">Remaining Principal</th>
           </tr>
         </thead>
@@ -133,102 +137,107 @@ class App extends Component {
     });
     return (
       <div className="App">
-        <label>Loan Amount:
-        <input
-          type="number"
-          id="loanAmount"
-          step="1000"
-          placeholder={numForm.format(this.state.loanAmount)}
-          value={this.state.loanAmount}
-          onChange={this.updateValue}
-        ></input>
-        </label>
-        <br />
-        <label>Interest Rate:
-        <input
-          type="number"
-          id="interest"
-          placeholder="3.7%"
-          step="0.1"
-          value={this.state.interest}
-          onChange={this.updateValue}
-        ></input>
-        </label>
-        <br />
-        <label>Payment Amount:
-        <input
-          type="number"
-          id="alternatePayment"
-          value={this.state.alternatePayment}
-          step="1"
-          placeholder={numForm.format(this.state.payment)}
-        ></input>
-        </label>
-        <br />
-        <label>Payment Frequency:
-        <select
-          id="frequency"
-          value={this.state.frequency}
-          onChange={this.updateValue}
-        >
-          <option value="12">Monthly</option>
-          <option value="26">Bi-Weekly</option>
-          <option value="52">Weekly</option>
-        </select>
-        </label>
-        <br />
-        <label>Amortization Years:
-        <select id="years" value={this.state.years} onChange={this.updateValue}>
-          <option value="1">1 Year</option>
-          <option value="5">5 Years</option>
-          <option value="6">6 Years</option>
-          <option value="7">7 Years</option>
-          <option value="8">8 Years</option>
-          <option value="10">10 Years</option>
-          <option value="15">15 Years</option>
-          <option value="20">20 Years</option>
-          <option value="25">25 Years</option>
-          <option value="30">30 Years</option>
-        </select>
-        </label>
-        <br />
-        <button onClick={this.doCalc}>Calculate</button>
-        <button onClick={this.reset}>Reset</button>
-        <table className="info" align="center">
-          <tbody>
-            <tr>
-              <td className="titles">Loan Value:</td>
-              <td>{numForm.format(this.state.loanAmount)}</td>
-            </tr>
-            <tr>
-              <td className="titles">Interest Rate:</td>
-              <td>{this.state.interest}%</td>
-            </tr>
-            <tr>
-              <td className="titles">Payment Per Year:</td>
-              <td>{this.state.frequency} payments / year</td>
-            </tr>
-            <tr>
-              <td className="titles">Amortization Period:</td>
-              <td>
-                {yearsFormat.format(this.state.years)}{" "}
-                {this.state.years > 1 ? "years" : "year"}
-              </td>
-            </tr>
-            <tr>
-              <td className="titles">Periodic Payment Amount:</td>
-              <td>{numForm.format(this.state.payment)}</td>
-            </tr>
-            <tr>
-              <td className="titles">Total Number of Payments:</td>
-              <td>{this.state.totalNumOfPayments}</td>
-            </tr>
-            <tr>
-              <td className="titles">Total Interest Paid:</td>
-              <td>{numForm.format(this.state.totalInterestPaid)}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="valuesBlock">
+          <label>Loan Amount:
+          <input
+            type="number"
+            id="loanAmount"
+            step="1000"
+            placeholder={numForm.format(this.state.loanAmount)}
+            value={this.state.loanAmount}
+            onChange={this.updateValue}
+          ></input>
+          </label>
+          <br />
+          <label>Interest Rate:
+          <input
+            type="number"
+            id="interest"
+            placeholder="3.7%"
+            step="0.1"
+            value={this.state.interest}
+            onChange={this.updateValue}
+          ></input>
+          </label>
+          <br />
+          <label>Payment Amount:
+          <input
+            type="number"
+            id="alternatePayment"
+            value={this.state.alternatePayment}
+            step="1"
+            placeholder={numForm.format(this.state.payment)}
+          ></input>
+          </label>
+          <br />
+          <label>Payment Frequency:
+          <select
+            id="frequency"
+            value={this.state.frequency}
+            onChange={this.updateValue}
+          >
+            <option value="12">Monthly</option>
+            <option value="26">Bi-Weekly</option>
+            <option value="52">Weekly</option>
+          </select>
+          </label>
+          <br />
+          <label>Amortization Years:
+          <select id="years" value={this.state.years} onChange={this.updateValue}>
+            <option value="1">1 Year</option>
+            <option value="2">2 Year</option>
+            <option value="3">3 Year</option>
+            <option value="4">4 Year</option>
+            <option value="5">5 Years</option>
+            <option value="6">6 Years</option>
+            <option value="7">7 Years</option>
+            <option value="8">8 Years</option>
+            <option value="10">10 Years</option>
+            <option value="15">15 Years</option>
+            <option value="20">20 Years</option>
+            <option value="25">25 Years</option>
+            <option value="30">30 Years</option>
+          </select>
+          </label>
+          <br />
+          <button onClick={this.doCalc}>Calculate</button>
+          <button onClick={this.reset}>Reset</button>
+          <table className="info" align="center">
+            <tbody>
+              <tr>
+                <td className="titles">Loan Value:</td>
+                <td>{numForm.format(this.state.loanAmount)}</td>
+              </tr>
+              <tr>
+                <td className="titles">Interest Rate:</td>
+                <td>{this.state.interest}%</td>
+              </tr>
+              <tr>
+                <td className="titles">Payment Per Year:</td>
+                <td>{this.state.frequency} payments / year</td>
+              </tr>
+              <tr>
+                <td className="titles">Amortization Period:</td>
+                <td>
+                  {yearsFormat.format(this.state.years)}{" "}
+                  {this.state.years > 1 ? "years" : "year"}
+                </td>
+              </tr>
+              <tr>
+                <td className="titles">Periodic Payment Amount:</td>
+                <td>{numForm.format(this.state.payment)}</td>
+              </tr>
+              <tr>
+                <td className="titles">Total Number of Payments:</td>
+                <td>{this.state.totalNumOfPayments}</td>
+              </tr>
+              <tr>
+                <td className="titles">Total Interest Paid:</td>
+                <td>{numForm.format(this.state.totalInterestPaid)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div>{this.amortizationTable()}</div>
       </div>
     );
@@ -256,6 +265,7 @@ class ItemRow extends Component {
         </td>
         <td>{numForm.format(item.principalAmount)}</td>
         <td>{numForm.format(item.interestAmount)}</td>
+        <td>{numForm.format(item.cumulativeInterest)}</td>
         <td>{numForm.format(item.remainingPrincipal)}</td>
       </tr>
     );
