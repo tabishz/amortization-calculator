@@ -1,13 +1,16 @@
-import { setSelectionRange } from "@testing-library/user-event/dist/utils";
+// import { setSelectionRange } from "@testing-library/user-event/dist/utils";
 import "./App.css";
 import React, { Component } from "react";
 // import ReactDOM from 'react-dom';
+
+const DEFAULT_LOAN_AMOUNT = 830000;
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loanAmount: 100000,
+      loanAmount: DEFAULT_LOAN_AMOUNT,
+      loanAmountSlider: DEFAULT_LOAN_AMOUNT,
       interest: 3.7,
       frequency: 12,
       years: 1,
@@ -16,16 +19,20 @@ class App extends Component {
   }
 
   updateValue = async (e) => {
-    // console.log(`Setting ${e.target.id} = ${e.target.value}`);
+    console.log(`Setting ${e.target.id} = ${e.target.value}`);
     await this.setState({ [e.target.id]: e.target.value });
+    if (this.state.loanAmount != this.state.loanAmountSlider) {
+      this.setState({loanAmount: this.state.loanAmountSlider});
+    }
     await this.doCalc();
     return;
   };
 
   reset = async () => {
     await this.setState({
-      loanAmount: 100000,
-      interest: 3.7,
+      loanAmount: DEFAULT_LOAN_AMOUNT,
+      loanAmountSlider: DEFAULT_LOAN_AMOUNT,
+      interest: 3.9,
       frequency: 12,
       years: 1,
       totalInterestPaid: 0,
@@ -149,11 +156,24 @@ class App extends Component {
           ></input>
           </label>
           <br />
+          <div className="slidecontainer">
+            <input
+              className="slider"
+              type="range"
+              id="loanAmountSlider"
+              min="1000"
+              max="1000000"
+              step="1000"
+              value={this.state.loanAmountSlider}
+              onChange={this.updateValue}
+            ></input>
+          </div>
+          <br />
           <label>Interest Rate:
           <input
             type="number"
             id="interest"
-            placeholder="3.7%"
+            placeholder="3.9%"
             step="0.1"
             value={this.state.interest}
             onChange={this.updateValue}
@@ -182,23 +202,21 @@ class App extends Component {
           </select>
           </label>
           <br />
-          <label>Amortization Years:
-          <select id="years" value={this.state.years} onChange={this.updateValue}>
-            <option value="1">1 Year</option>
-            <option value="2">2 Year</option>
-            <option value="3">3 Year</option>
-            <option value="4">4 Year</option>
-            <option value="5">5 Years</option>
-            <option value="6">6 Years</option>
-            <option value="7">7 Years</option>
-            <option value="8">8 Years</option>
-            <option value="10">10 Years</option>
-            <option value="15">15 Years</option>
-            <option value="20">20 Years</option>
-            <option value="25">25 Years</option>
-            <option value="30">30 Years</option>
-          </select>
+          <label>Amortization Years: <strong>{this.state.years}</strong>
           </label>
+          <br />
+          <div className="slidecontainer">
+            <input
+              className="slider"
+              type="range"
+              id="years"
+              min="1"
+              max="30"
+              step="1"
+              value={this.state.years}
+              onChange={this.updateValue}
+            ></input>
+          </div>
           <br />
           <button onClick={this.doCalc}>Calculate</button>
           <button onClick={this.reset}>Reset</button>
