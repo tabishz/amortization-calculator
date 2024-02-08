@@ -1,6 +1,6 @@
 // import { setSelectionRange } from "@testing-library/user-event/dist/utils";
-import "./App.css";
-import React, { Component } from "react";
+import './App.css';
+import React, { Component } from 'react';
 // import ReactDOM from 'react-dom';
 
 const DEFAULT_LOAN_AMOUNT = 830000;
@@ -22,7 +22,7 @@ class App extends Component {
     console.log(`Setting ${e.target.id} = ${e.target.value}`);
     await this.setState({ [e.target.id]: e.target.value });
     if (this.state.loanAmount != this.state.loanAmountSlider) {
-      this.setState({loanAmount: this.state.loanAmountSlider});
+      this.setState({ loanAmount: this.state.loanAmountSlider });
     }
     await this.doCalc();
     return;
@@ -59,7 +59,7 @@ class App extends Component {
       const effInt = interest / 100 / frequency;
       const totalNumOfPayments = frequency * years;
       const altPayment = document.getElementById('alternatePayment').value;
-      if (altPayment) await this.setState({alternatePayment: altPayment});
+      if (altPayment) await this.setState({ alternatePayment: altPayment });
       let paymentAmount =
         loanAmount *
         ((effInt * Math.pow(1 + effInt, totalNumOfPayments)) /
@@ -83,7 +83,7 @@ class App extends Component {
         actualNumOfPayments++;
         rows.push(
           <ItemRow
-            key={"r" + i}
+            key={'r' + i}
             paymentNumber={i}
             payment={paymentAmount}
             principalAmount={principalAmount}
@@ -135,25 +135,26 @@ class App extends Component {
   }
 
   render() {
-    const numForm = new Intl.NumberFormat("en-CA", {
-      style: "currency",
-      currency: "CAD",
+    const numForm = new Intl.NumberFormat('en-CA', {
+      style: 'currency',
+      currency: 'CAD',
     });
-    const yearsFormat = new Intl.NumberFormat("en-CA", {
+    const yearsFormat = new Intl.NumberFormat('en-CA', {
       maximumSignificantDigits: 2,
     });
     return (
       <div className="App">
         <div className="valuesBlock">
-          <label>Loan Amount:
-          <input
-            type="number"
-            id="loanAmount"
-            step="1000"
-            placeholder={numForm.format(this.state.loanAmount)}
-            value={this.state.loanAmount}
-            onChange={this.updateValue}
-          ></input>
+          <label>
+            Loan Amount:
+            <input
+              type="number"
+              id="loanAmount"
+              step="1000"
+              placeholder={numForm.format(this.state.loanAmount)}
+              value={this.state.loanAmount}
+              onChange={this.updateValue}
+            ></input>
           </label>
           <br />
           <div className="slidecontainer">
@@ -169,40 +170,44 @@ class App extends Component {
             ></input>
           </div>
           <br />
-          <label>Interest Rate:
-          <input
-            type="number"
-            id="interest"
-            placeholder="3.9%"
-            step="0.1"
-            value={this.state.interest}
-            onChange={this.updateValue}
-          ></input>
+          <label>
+            Interest Rate:
+            <input
+              type="number"
+              id="interest"
+              placeholder="3.9%"
+              step="0.1"
+              value={this.state.interest}
+              onChange={this.updateValue}
+            ></input>
           </label>
           <br />
-          <label>Payment Amount:
-          <input
-            type="number"
-            id="alternatePayment"
-            value={this.state.alternatePayment}
-            step="1"
-            placeholder={numForm.format(this.state.payment)}
-          ></input>
+          <label>
+            Payment Amount:
+            <input
+              type="number"
+              id="alternatePayment"
+              value={this.state.alternatePayment}
+              step="1"
+              placeholder={numForm.format(this.state.payment)}
+            ></input>
           </label>
           <br />
-          <label>Payment Frequency:
-          <select
-            id="frequency"
-            value={this.state.frequency}
-            onChange={this.updateValue}
-          >
-            <option value="12">Monthly</option>
-            <option value="26">Bi-Weekly</option>
-            <option value="52">Weekly</option>
-          </select>
+          <label>
+            Payment Frequency:
+            <select
+              id="frequency"
+              value={this.state.frequency}
+              onChange={this.updateValue}
+            >
+              <option value="12">Monthly</option>
+              <option value="26">Bi-Weekly</option>
+              <option value="52">Weekly</option>
+            </select>
           </label>
           <br />
-          <label>Amortization Years: <strong>{this.state.years}</strong>
+          <label>
+            Amortization Years: <strong>{this.state.years}</strong>
           </label>
           <br />
           <div className="slidecontainer">
@@ -237,8 +242,8 @@ class App extends Component {
               <tr>
                 <td className="titles">Amortization Period:</td>
                 <td>
-                  {yearsFormat.format(this.state.years)}{" "}
-                  {this.state.years > 1 ? "years" : "year"}
+                  {yearsFormat.format(this.state.years)}{' '}
+                  {this.state.years > 1 ? 'years' : 'year'}
                 </td>
               </tr>
               <tr>
@@ -265,9 +270,9 @@ class App extends Component {
 class ItemRow extends Component {
   render() {
     const item = this.props;
-    const numForm = new Intl.NumberFormat("en-CA", {
-      style: "currency",
-      currency: "CAD",
+    const numForm = new Intl.NumberFormat('en-CA', {
+      style: 'currency',
+      currency: 'CAD',
     });
     return (
       <tr className="amortization">
