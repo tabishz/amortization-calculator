@@ -3,18 +3,20 @@ import './App.css';
 import React, { Component } from 'react';
 // import ReactDOM from 'react-dom';
 
-const DEFAULT_LOAN_AMOUNT = 700000;
+const DEFAULT_LOAN_AMOUNT = 850000;
+const DEFAULT_DOWN_PAYMENT = 20;
+const DEFAULT_PROPERTY_TAX = 0.0065718;
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       totalLoan: DEFAULT_LOAN_AMOUNT,
-      downPayment: 20,
-      loanAmount: DEFAULT_LOAN_AMOUNT * 0.8,
-      loanAmountSlider: DEFAULT_LOAN_AMOUNT * 0.8,
+      amountSlider: DEFAULT_LOAN_AMOUNT,
+      downPayment: DEFAULT_DOWN_PAYMENT,
+      loanAmount: DEFAULT_LOAN_AMOUNT * (1 - DEFAULT_DOWN_PAYMENT / 100),
       interest: 5,
-      propertyTaxRate: 0.0065718,
+      propertyTaxRate: DEFAULT_PROPERTY_TAX,
       frequency: 12,
       years: 25,
       totalInterestPaid: 0,
@@ -22,10 +24,9 @@ class App extends Component {
   }
 
   updateValue = async (e) => {
-    console.log(`Setting ${e.target.id} = ${e.target.value}`);
     await this.setState({ [e.target.id]: e.target.value });
-    if (this.state.loanAmount != this.state.loanAmountSlider) {
-      this.setState({ loanAmount: this.state.loanAmountSlider });
+    if (this.state.totalLoan != this.state.amountSlider) {
+      await this.setState({ totalLoan: this.state.amountSlider });
     }
     await this.doCalc();
     return;
@@ -34,15 +35,14 @@ class App extends Component {
   reset = async () => {
     await this.setState({
       totalLoan: DEFAULT_LOAN_AMOUNT,
+      amountSlider: DEFAULT_LOAN_AMOUNT,
+      downPayment: DEFAULT_DOWN_PAYMENT,
+      loanAmount: DEFAULT_LOAN_AMOUNT * (1 - DEFAULT_DOWN_PAYMENT / 100),
       interest: 5,
-      propertyTaxRate: 0.0065718,
-      downPayment: 20,
-      loanAmount: totalLoan * (1 - this.downPayment / 100),
-      loanAmountSlider: totalLoan * (1 - this.downPayment / 100),
+      propertyTaxRate: DEFAULT_PROPERTY_TAX,
       frequency: 12,
-      years: 1,
+      years: 25,
       totalInterestPaid: 0,
-      paymentAmount: 8501.29,
       alternatePayment: null,
     });
     const altPayment = document.getElementById('alternatePayment');
@@ -53,7 +53,7 @@ class App extends Component {
 
   doCalc = async () => {
     if (
-      this.state.loanAmount &&
+      this.state.totalLoan &&
       this.state.interest &&
       this.state.frequency &&
       this.state.years
@@ -61,7 +61,10 @@ class App extends Component {
       const frequency = parseInt(this.state.frequency);
       const years = parseInt(this.state.years);
       const interest = parseFloat(this.state.interest);
-      const loanAmount = parseFloat(this.state.loanAmount);
+      const loanAmount = parseFloat(
+        this.state.totalLoan * (1 - this.state.downPayment / 100)
+      );
+      await this.setState({loanAmount: loanAmount});
       const effInt = interest / 100 / frequency;
       const totalNumOfPayments = frequency * years;
       const altPayment = document.getElementById('alternatePayment').value;
@@ -163,9 +166,20 @@ class App extends Component {
             ></input>
           </label>
           <br />
-          <label>
-            Down Payment Percent: {this.state.downPayment}%
-          </label>
+          <div className="slidecontainer">
+            <input
+              className="slider"
+              type="range"
+              id="amountSlider"
+              min="1000"
+              max="1000000"
+              step="1000"
+              value={this.state.amountSlider}
+              onChange={this.updateValue}
+            ></input>
+          </div>
+          <br />
+          <label>Down Payment Percent: {this.state.downPayment}%</label>
           <br />
           <div className="slidecontainer">
             <input
@@ -191,19 +205,6 @@ class App extends Component {
               onChange={this.updateValue}
             ></input>
           </label>
-          <br />
-          <div className="slidecontainer">
-            <input
-              className="slider"
-              type="range"
-              id="loanAmountSlider"
-              min="1000"
-              max="1000000"
-              step="1000"
-              value={this.state.loanAmountSlider}
-              onChange={this.updateValue}
-            ></input>
-          </div>
           <br />
           <label>
             Interest Rate:
@@ -298,8 +299,20 @@ class App extends Component {
               </tr>
               <tr>
                 <td className="titles">Annual Property Tax:</td>
-                <td>{numForm.format(this.state.propertyTaxRate *
-                  this.state.loanAmount * 1.2)}</td>
+                <td>
+                  {numForm.format(
+                    this.state.propertyTaxRate * this.state.totalLoan
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td className="titles">Total Payment:</td>
+                <td>
+                  {numForm.format(
+                    (this.state.propertyTaxRate * this.state.totalLoan)
+                    / this.state.frequency + this.state.payment
+                  )}
+                </td>
               </tr>
               <tr>
                 <td className="titles">Total Number of Payments:</td>
