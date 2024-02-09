@@ -3,17 +3,20 @@ import './App.css';
 import React, { Component } from 'react';
 // import ReactDOM from 'react-dom';
 
-const DEFAULT_LOAN_AMOUNT = 830000;
+const DEFAULT_LOAN_AMOUNT = 700000;
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loanAmount: DEFAULT_LOAN_AMOUNT,
-      loanAmountSlider: DEFAULT_LOAN_AMOUNT,
-      interest: 3.7,
+      totalLoan: DEFAULT_LOAN_AMOUNT,
+      downPayment: 20,
+      loanAmount: DEFAULT_LOAN_AMOUNT * 0.8,
+      loanAmountSlider: DEFAULT_LOAN_AMOUNT * 0.8,
+      interest: 5,
+      propertyTaxRate: 0.0065718,
       frequency: 12,
-      years: 1,
+      years: 25,
       totalInterestPaid: 0,
     };
   }
@@ -30,9 +33,12 @@ class App extends Component {
 
   reset = async () => {
     await this.setState({
-      loanAmount: DEFAULT_LOAN_AMOUNT,
-      loanAmountSlider: DEFAULT_LOAN_AMOUNT,
-      interest: 3.9,
+      totalLoan: DEFAULT_LOAN_AMOUNT,
+      interest: 5,
+      propertyTaxRate: 0.0065718,
+      downPayment: 20,
+      loanAmount: totalLoan * (1 - this.downPayment / 100),
+      loanAmountSlider: totalLoan * (1 - this.downPayment / 100),
       frequency: 12,
       years: 1,
       totalInterestPaid: 0,
@@ -146,6 +152,35 @@ class App extends Component {
       <div className="App">
         <div className="valuesBlock">
           <label>
+            Total Loan:
+            <input
+              type="number"
+              id="totalLoan"
+              step="1000"
+              placeholder={numForm.format(this.state.totalLoan)}
+              value={this.state.totalLoan}
+              onChange={this.updateValue}
+            ></input>
+          </label>
+          <br />
+          <label>
+            Down Payment Percent: {this.state.downPayment}%
+          </label>
+          <br />
+          <div className="slidecontainer">
+            <input
+              className="slider"
+              type="range"
+              id="downPayment"
+              min="1"
+              max="50"
+              step="1"
+              value={this.state.downPayment}
+              onChange={this.updateValue}
+            ></input>
+          </div>
+          <br />
+          <label>
             Loan Amount:
             <input
               type="number"
@@ -179,6 +214,17 @@ class App extends Component {
               step="0.1"
               value={this.state.interest}
               onChange={this.updateValue}
+            ></input>
+          </label>
+          <br />
+          <label>
+            Annual Property Tax Rate:
+            <input
+              type="number"
+              id="propertyTaxRate"
+              value={this.state.propertyTaxRate}
+              step="0.000001"
+              placeholder={numForm.format(this.state.propertyTaxRate)}
             ></input>
           </label>
           <br />
@@ -249,6 +295,11 @@ class App extends Component {
               <tr>
                 <td className="titles">Periodic Payment Amount:</td>
                 <td>{numForm.format(this.state.payment)}</td>
+              </tr>
+              <tr>
+                <td className="titles">Annual Property Tax:</td>
+                <td>{numForm.format(this.state.propertyTaxRate *
+                  this.state.loanAmount * 1.2)}</td>
               </tr>
               <tr>
                 <td className="titles">Total Number of Payments:</td>
