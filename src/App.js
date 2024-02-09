@@ -153,6 +153,7 @@ class App extends Component {
     });
     return (
       <div className="App">
+        <h1>Amortization Calculator</h1>
         <div className="valuesBlock">
           <label>
             Total Loan:
@@ -207,16 +208,21 @@ class App extends Component {
           </label>
           <br />
           <label>
-            Interest Rate:
+            Interest Rate: {this.state.interest}%
+          </label>
+          <br />
+          <div className="slidecontainer">
             <input
-              type="number"
+              className="slider"
+              type="range"
               id="interest"
-              placeholder="3.9%"
-              step="0.1"
+              min="0.1"
+              max="30"
+              step="0.05"
               value={this.state.interest}
               onChange={this.updateValue}
             ></input>
-          </label>
+          </div>
           <br />
           <label>
             Annual Property Tax Rate:
