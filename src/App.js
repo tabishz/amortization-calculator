@@ -64,7 +64,7 @@ class App extends Component {
       const loanAmount = parseFloat(
         this.state.totalLoan * (1 - this.state.downPayment / 100)
       );
-      await this.setState({loanAmount: loanAmount});
+      await this.setState({ loanAmount: loanAmount });
       const effInt = interest / 100 / frequency;
       const totalNumOfPayments = frequency * years;
       const altPayment = document.getElementById('alternatePayment').value;
@@ -207,9 +207,7 @@ class App extends Component {
             ></input>
           </label>
           <br />
-          <label>
-            Interest Rate: {this.state.interest}%
-          </label>
+          <label>Interest Rate: {this.state.interest}%</label>
           <br />
           <div className="slidecontainer">
             <input
@@ -281,6 +279,19 @@ class App extends Component {
           <table className="info" align="center">
             <tbody>
               <tr>
+                <td className="titles">Total Loan:</td>
+                <td>{numForm.format(this.state.totalLoan)}</td>
+              </tr>
+              <tr>
+                <td className="titles">Down Payment:</td>
+                <td>
+                  {numForm.format(
+                    (this.state.downPayment / 100) *
+                      this.state.totalLoan
+                  )}
+                </td>
+              </tr>
+              <tr>
                 <td className="titles">Loan Value:</td>
                 <td>{numForm.format(this.state.loanAmount)}</td>
               </tr>
@@ -315,8 +326,9 @@ class App extends Component {
                 <td className="titles">Total Payment:</td>
                 <td>
                   {numForm.format(
-                    (this.state.propertyTaxRate * this.state.totalLoan)
-                    / this.state.frequency + this.state.payment
+                    (this.state.propertyTaxRate * this.state.totalLoan) /
+                      this.state.frequency +
+                      this.state.payment
                   )}
                 </td>
               </tr>
